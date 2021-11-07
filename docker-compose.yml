@@ -1,0 +1,38 @@
+networks:
+  web-network:
+
+volumes:
+  mysql-data:
+  local:
+  
+services:
+
+  accountapi:
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    volumes:
+      - local:/local
+    networks:
+      - web-network
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "mysql"
+
+  mysql:
+    image: mysql:5.7
+    networks:
+      - web-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_DATABASE: accountapi
+      MYSQL_ROOT_PASSWORD: ''
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
